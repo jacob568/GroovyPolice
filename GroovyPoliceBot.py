@@ -16,12 +16,12 @@ client = discord.Client()
 async def on_ready():
 	for guild in client.guilds:
 		if guild.name == GUILD:
-			break
-
-	print(
-		f'{client.user} is connected to the following guild:\n'
-		f'{guild.name}(id: {guild.id})'
-	)
+			for voice_channel in guild.voice_channels:
+				if voice_channel.name == "GroovyJail":
+					print(
+						f'{client.user} is connected to the following guild:\n'
+						f'{guild.name}(id: {guild.id})'
+					)
 
 #{name: strikeInt}
 user_strikes = {}
@@ -32,6 +32,8 @@ def ApplyStrike(offender):
 	if offender in user_strikes.keys():
 		user_strikes[offender] += 1
 		if user_strikes[offender] >= 3:
+			#Move to groovy jail
+
 			user_strikes[offender] = 0
 			return True
 	else:
@@ -51,6 +53,7 @@ async def on_message(message):
 	printStrikeMessage = False
 	response = ""
 
+	#Checks the groovy commands channel for messages that aren't groovy commands
 	if channel == constants.GROOVYCHANNEL and splitMessage:
 		if splitMessage[0] not in constants.GROOVYBOTCOMMANDS:
 			await message.delete()
@@ -60,7 +63,7 @@ async def on_message(message):
 			await message.channel.send("3 strikes " + name + "! Know what that means... nothing I haven't programmed a punishment yet")
 		else:
 			await message.channel.send(response)
-
+	#Checks for groovy commands in non groovy channels
 	if channel != constants.GROOVYCHANNEL and splitMessage:
 		for command in constants.GROOVYBOTCOMMANDS:
 			if splitMessage[0] == command:
@@ -70,7 +73,13 @@ async def on_message(message):
 				await message.delete()
 				#prints the message depending on number of strikes
 				if printStrikeMessage:
-					await message.channel.send("3 strikes " + name + "! Know what that means... nothing I haven't programmed a punishment yet")
+					#need to find the groovy jail channel
+					for channel in message.guild.voice_channels:
+						if channel.name == constants.GROOVYJAIL:
+							await message.author.move_to(channel)
+							break
+
+					await message.channel.send("3 strikes " + name + "! You're going to GroovyJail, PUNK")
 				else:
 					await message.channel.send(response)
 

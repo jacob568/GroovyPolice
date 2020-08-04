@@ -22,3 +22,4 @@ TELLINGOFFMESSAGES = [
 ]
 
 GROOVYCHANNEL = "place-groovy-commands-here"
+GROOVYJAIL = "GroovyJail"
